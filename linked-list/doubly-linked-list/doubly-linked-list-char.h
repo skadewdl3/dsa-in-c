@@ -122,6 +122,7 @@ CharLL CharLL_shift(CharLL list)
   CharNode_destroy(list.head);
   new_node_head->prev = NULL;
   list.head = new_node_head;
+  list->length--;
   return list;
 }
 

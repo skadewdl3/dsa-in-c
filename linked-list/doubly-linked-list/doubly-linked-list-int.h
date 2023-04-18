@@ -122,6 +122,7 @@ IntLL IntLL_shift(IntLL list)
   IntNode_destroy(list.head);
   new_node_head->prev = NULL;
   list.head = new_node_head;
+  list->length--;
   return list;
 }
 
