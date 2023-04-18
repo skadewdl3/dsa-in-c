@@ -4,7 +4,7 @@
 #define ERROR_RESET_COLOR "\x1b[m"
 
 typedef enum {
-  MEM_ALLOC_ERROR, OUT_OF_BOUNDS, LIST_EMPTY, LIST_DESTROYED
+  MEM_ALLOC_ERROR, OUT_OF_BOUNDS, LIST_EMPTY, LIST_DESTROYED, PRINT_EMPTY_LIST
 } LL_errors;
 
 void LL_print_error (char* type, char* message, char* solution) {
@@ -34,6 +34,10 @@ void LL_error (LL_errors error_code) {
       break;
     case LIST_DESTROYED:
       LL_print_error("Logical Error", "You tried access the list after it has been destroyed.", "Try creating a new list or check for unintended LL_destroy calls.");
+      break;
+    
+    case PRINT_EMPTY_LIST:
+      LL_print_info("You tried to print an empty list", "This message was printed to avoid unintended operations.", "Try adding an element to the list using push/unshift/insert or check for unintended calls to pop/shift/delete.");
       break;
     
 }

@@ -5,6 +5,7 @@ typedef struct CharLLNode
 {
   char value;
   struct CharLLNode *next;
+  struct CharLLNode *prev;
 } CharNode;
 
 typedef struct
@@ -13,14 +14,15 @@ typedef struct
   CharNode *head;
 } CharLL;
 
-CharNode *CharNode_create(int val)
+CharNode *CharNode_create(char val)
 {
-  CharNode *v = (CharNode *)malloc(sizeof(CharNode));
+  CharNode *v = (CharNode*)malloc(sizeof(CharNode));
   if (v == NULL) {
     LL_error(MEM_ALLOC_ERROR);
     exit(1);
   }
   v->next = NULL;
+  v->prev = NULL;
   v->value = val;
   return v;
 }
@@ -68,247 +70,145 @@ int CharLL_is_empty(CharLL *list)
   return list->length == 0;
 }
 
-CharLL *CharLL_push(CharLL *list, char value)
-{
+void CharLL_push (CharLL *list, char value) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
-    exit(1);
+    return;
   }
-  CharNode *new_node = CharNode_create(value);
-  if (CharLL_is_empty(list))
-  {
-    list->head = new_node;
+  CharNode *node = CharNode_create(value);
+  if (list->length == 0) {
+    list->head = node;
+    node->next = node;
+    node->prev = node;
   }
-  else
-  {
+  else {
     CharNode *current = list->head;
-    while (current->next != NULL)
-    {
+    for (int i = 0; i < list->length - 1; i++) {
       current = current->next;
     }
-    current->next = new_node;
+
+    node->next = list->head;
+    list->head->prev = node;
+
+    node->prev = current;
+    current->next = node;
   }
   list->length++;
-  return list;
 }
 
-CharLL *CharLL_unshift(CharLL *list, char value)
-{
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  CharNode *new_node = CharNode_create(value);
-  new_node->next = list->head;
-  list->head = new_node;
-  list->length++;
-  return list;
-}
 
-CharLL *CharLL_pop(CharLL *list)
-{
+void CharLL_pop (CharLL *list) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
-    exit(1);
+    return;
   }
-  if (CharLL_is_empty(list)) {
+  if (list->length == 0) {
     LL_error(LIST_EMPTY);
-    return list;
+    return;
+  }
+  if (list->length == 1) {
+    CharNode_destroy(list->head);
+    list->head = CharNode_create(0);
+    list->length = 0;
+    return;
   }
   CharNode *current = list->head;
-  int length = list->length;
-  while (length - 2)
-  {
+  for (int i = 0; i < list->length - 1; i++) {
     current = current->next;
-    length--;
   }
-  CharNode_destroy(current->next);
-  current->next = NULL;
+  
+  CharNode *prev = current->prev;
+  prev->next = list->head;
+  list->head->prev = prev;
+  CharNode_destroy(current);
   list->length--;
-  return list;
 }
 
-CharLL *CharLL_shift(CharLL *list)
-{
+void CharLL_insert (CharLL *list, int value, int index) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
-    exit(1);
+    return;
   }
-  if (CharLL_is_empty(list)) {
-    LL_error(LIST_EMPTY);
-    return list;
-  }
-  CharNode *new_node_head = list->head->next;
-  CharNode_destroy(list->head);
-  list->head = new_node_head;
-  return list;
-}
-
-void CharLL_print(CharLL *list)
-{
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  CharNode *current = list->head;
-  while (current != NULL)
-  {
-    printf("\n%c", current->value);
-    current = current->next;
-  }
-  printf("\n");
-}
-
-CharLL *CharLL_insert(CharLL *list, char value, int index)
-{
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  CharNode *new_node = CharNode_create(value);
   if (index < 0 || index > list->length) {
     LL_error(OUT_OF_BOUNDS);
-    return list;
+    return;
   }
-  if (CharLL_is_empty(list))
-  {
+
+  CharNode *new_node = CharNode_create(value);
+
+  if (index == 0) {
+    CharNode *next = list->head->next;
+    CharNode *prev = list->head->prev;
+    new_node->prev = prev;
+    new_node->next = list->head;
     list->head = new_node;
   }
-  else
-  {
+  else {
     CharNode *current = list->head;
-    int length = list->length;
-    if (index > 0)
-    {
-
-      while (index - 1)
-      {
-        current = current->next;
-        index--;
-      }
-      CharNode *old = current->next;
-      new_node->next = old;
-      current->next = new_node;
+    for (int i = 0; i < index; i++) {
+      current = current->next;
     }
-    else
-    {
-      new_node->next = current;
-      list->head = new_node;
-    }
+    CharNode *prev = current->prev;
+    new_node->prev = prev;
+    new_node->next = current;
+    prev->next = new_node;
+    current->prev = new_node;
   }
   list->length++;
-  return list;
 }
 
-CharLL *CharLL_delete(CharLL *list, int index)
-{
+void CharLL_delete (CharLL *list, int index) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
-    exit(1);
+    return;
   }
-  if (CharLL_is_empty(list))
-  {
-    LL_error(LIST_EMPTY);
-    return list;
-  }
-  if (index < 0 || index > list->length - 1) {
+  if (index < 0 || index >= list->length) {
     LL_error(OUT_OF_BOUNDS);
-    return list;
+    return;
   }
-  else
-  {
+  if (list->length == 0) {
+    LL_error(LIST_EMPTY);
+    return;
+  }
+  if (list->length == 1) {
+    CharNode_destroy(list->head);
+    list->head = CharNode_create(0);
+    list->length = 0;
+    return;
+  }
+  if (index == 0) {
     CharNode *current = list->head;
-    if (index > 0)
-    {
-
-      while (index - 1)
-      {
-        current = current->next;
-        index--;
-      }
-
-      CharNode *to_delete = current->next;
-      current->next = to_delete->next;
-      CharNode_destroy(to_delete);
+    CharNode *next = current->next;
+    CharNode *prev = current->prev;
+    list->head = next;
+    CharNode_destroy(current);
+  }
+  else {
+    CharNode *current = list->head;
+    for (int i = 0; i < index; i++) {
+      current = current->next;
     }
-    else
-    {
-      list->head = current->next;
-      CharNode_destroy(current);
-    }
+    CharNode *prev = current->prev;
+    CharNode *next = current->next;
+    prev->next = next;
+    next->prev = prev;
+    CharNode_destroy(current);
   }
   list->length--;
-  return list;
 }
 
-CharLL *CharLL_reverse(CharLL *list)
-{
+
+void CharLL_print (CharLL *list) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
-    exit(1);
+    return;
   }
-  CharNode *prev = NULL;
+  if (list->length == 0) {
+    printf("\nThe list is empty.");
+  }
   CharNode *current = list->head;
-
-  while (current->next != NULL)
-  {
-    CharNode *next_copy = current->next;
-    CharNode *current_copy = current;
-    current->next = prev;
-    current = next_copy;
-    prev = current_copy;
-  }
-  current->next = prev;
-  list->head = current;
-  return list;
-}
-
-
-char CharLL_get (CharLL *list, int index) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  if (CharLL_is_empty(list)) {
-    LL_error(LIST_EMPTY);
-    return '\0';
-  }
-  if (index < 0 || index > list->length - 1) {
-    LL_error(OUT_OF_BOUNDS);
-    return '\0';
-  }
-
-  CharNode* current = list->head;
-
-  while (index) {
+  for (int i = 0; i < list->length; i++) {
+    printf("%c ", current->value);
     current = current->next;
-    index--;
   }
-
-  return current->value;
-}
-
-CharLL *CharLL_set(CharLL *list, char value, int index) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-    if (CharLL_is_empty(list)) {
-      LL_error(LIST_EMPTY);
-      return list;
-    }
-  if (index < 0 || index > list->length - 1) {
-    LL_error(OUT_OF_BOUNDS);
-    return list;
-  }
-
-  CharNode* current = list->head;
-
-  while (index) {
-    current = current->next;
-    index--;
-  }
-
-  current->value = value;
-  return list;
 }

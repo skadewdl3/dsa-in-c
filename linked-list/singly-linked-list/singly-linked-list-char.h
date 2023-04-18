@@ -99,7 +99,9 @@ CharLL *CharLL_unshift(CharLL *list, char value)
     exit(1);
   }
   CharNode *new_node = CharNode_create(value);
-  new_node->next = list->head;
+  if (list->length != 0) {
+    new_node->next = list->head;
+  }
   list->head = new_node;
   list->length++;
   return list;
@@ -141,6 +143,7 @@ CharLL *CharLL_shift(CharLL *list)
   CharNode *new_node_head = list->head->next;
   CharNode_destroy(list->head);
   list->head = new_node_head;
+  list->length--;
   return list;
 }
 
@@ -150,6 +153,9 @@ void CharLL_print(CharLL *list)
     LL_error(LIST_DESTROYED);
     exit(1);
   }
+  if (list->length == 0) {
+    LL_error(PRINT_EMPTY_LIST);
+  } 
   CharNode *current = list->head;
   while (current != NULL)
   {
