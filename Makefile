@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./searching/binary-search.c -o ./searching/binary-search.sh -lm
+	gcc ./sorting/selection-sort.c -o ./sorting/selection-sort.sh -lm
 clean:
-	rm -rf ./searching/binary-search.sh
+	rm -rf ./sorting/selection-sort.sh
 run:
-	./searching/binary-search.sh
+	./sorting/selection-sort.sh

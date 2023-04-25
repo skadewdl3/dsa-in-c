@@ -39,6 +39,7 @@ int main () {
   int length = 8;
   int key = 7;
 
+  bubble_sort(array, length);
   int index = binary_search(array, length, key);
 
   if (index == -1) {
