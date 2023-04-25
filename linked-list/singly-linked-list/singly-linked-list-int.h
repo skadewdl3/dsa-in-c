@@ -67,7 +67,7 @@ int IntLL_is_empty(IntLL *list)
   return list->length == 0;
 }
 
-IntLL *IntLL_push(IntLL *list, int value)
+IntNode *IntLL_push(IntLL *list, int value)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
@@ -88,23 +88,25 @@ IntLL *IntLL_push(IntLL *list, int value)
     current->next = new_node;
   }
   list->length++;
-  return list;
+  return new_node;
 }
 
-IntLL *IntLL_unshift(IntLL *list, int value)
+IntNode *IntLL_unshift(IntLL *list, int value)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
   IntNode *new_node = IntNode_create(value);
-  new_node->next = list->head;
+  if (list->length != 0) {
+    new_node->next = list->head;
+  }
   list->head = new_node;
   list->length++;
-  return list;
+  return new_node;
 }
 
-IntLL *IntLL_pop(IntLL *list)
+int IntLL_pop(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
@@ -112,7 +114,7 @@ IntLL *IntLL_pop(IntLL *list)
   }
   if (IntLL_is_empty(list)) {
     LL_error(LIST_EMPTY);
-    return list;
+    return -1;
   }
   IntNode *current = list->head;
   int length = list->length;
@@ -121,13 +123,14 @@ IntLL *IntLL_pop(IntLL *list)
     current = current->next;
     length--;
   }
+  int value = current->next->value;
   IntNode_destroy(current->next);
   current->next = NULL;
   list->length--;
-  return list;
+  return value;
 }
 
-IntLL *IntLL_shift(IntLL *list)
+int IntLL_shift(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
@@ -135,12 +138,18 @@ IntLL *IntLL_shift(IntLL *list)
   }
   if (IntLL_is_empty(list)) {
     LL_error(LIST_EMPTY);
-    return list;
+    return -1;
+  }
+  if (list->length == 1) {
+    list->length = 0;
+    return list->head->value;
   }
   IntNode *new_node_head = list->head->next;
+  int value = list->head->value;
   IntNode_destroy(list->head);
   list->head = new_node_head;
-  return list;
+  list->length--;
+  return value;
 }
 
 void IntLL_print(IntLL *list)
@@ -149,11 +158,16 @@ void IntLL_print(IntLL *list)
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  IntNode *current = list->head;
-  while (current != NULL)
-  {
-    printf("\n%d", current->value);
-    current = current->next;
+  if (list->length == 0) {
+    LL_error(PRINT_EMPTY_LIST);
+  }
+  else {
+    IntNode *current = list->head;
+    while (current != NULL)
+    {
+      printf("\n%d", current->value);
+      current = current->next;
+    }
   }
   printf("\n");
 }

@@ -1,65 +1,77 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "./ll-errors.h"
 
-typedef struct CharLLNode
+typedef struct Poly {
+  int coefficient;
+  int exponent;
+} Polynomial;
+
+typedef struct IntLLNode
 {
-  char value;
-  struct CharLLNode *next;
-} CharNode;
+  Polynomial value;
+  struct IntLLNode *next;
+} IntNode;
 
 typedef struct
 {
   int length;
-  CharNode *head;
-} CharLL;
+  IntNode *head;
+} IntLL;
 
-CharNode *CharNode_create(int val)
+Polynomial Polynomial_create (int coefficient, int exponent) {
+  Polynomial p;
+  p.coefficient = coefficient;
+  p.exponent = exponent;
+  return p;
+}
+
+IntNode *IntNode_create(Polynomial p)
 {
-  CharNode *v = (CharNode *)malloc(sizeof(CharNode));
+  IntNode *v = (IntNode *)malloc(sizeof(IntNode));
   if (v == NULL) {
     LL_error(MEM_ALLOC_ERROR);
     exit(1);
   }
   v->next = NULL;
-  v->value = val;
+  v->value = p;
   return v;
 }
 
-void CharNode_destroy(CharNode *node)
+void IntNode_destroy(IntNode *node)
 {
-  
   free(node);
 }
 
-CharLL *CharLL_create()
+IntLL *IntLL_create()
 {
-  CharLL *list = (CharLL*)malloc(sizeof(CharLL));
-  CharNode *head = CharNode_create(0);
+  IntLL *list = (IntLL*)malloc(sizeof(IntLL));
+  IntNode *head = IntNode_create(Polynomial_create(0, 0));
   list->head = head;
   list->length = 0;
   return list;
 }
 
-void CharLL_destroy(CharLL *list)
+void IntLL_destroy(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  CharNode *prev = NULL;
-  CharNode *current = list->head;
+  IntNode *prev = NULL;
+  IntNode *current = list->head;
   while (current->next != NULL)
   {
     prev = current;
     current = current->next;
-    CharNode_destroy(prev);
+    IntNode_destroy(prev);
   }
-  CharNode_destroy(current);
+  IntNode_destroy(current);
   free(list);
   list->head = NULL;
 }
 
-int CharLL_is_empty(CharLL *list)
+int IntLL_is_empty(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
@@ -68,20 +80,20 @@ int CharLL_is_empty(CharLL *list)
   return list->length == 0;
 }
 
-CharLL *CharLL_push(CharLL *list, char value)
+IntNode *IntLL_push(IntLL *list, Polynomial p)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  CharNode *new_node = CharNode_create(value);
-  if (CharLL_is_empty(list))
+  IntNode *new_node = IntNode_create(p);
+  if (IntLL_is_empty(list))
   {
     list->head = new_node;
   }
   else
   {
-    CharNode *current = list->head;
+    IntNode *current = list->head;
     while (current->next != NULL)
     {
       current = current->next;
@@ -89,65 +101,71 @@ CharLL *CharLL_push(CharLL *list, char value)
     current->next = new_node;
   }
   list->length++;
-  return list;
+  return new_node;
 }
 
-CharLL *CharLL_unshift(CharLL *list, char value)
+IntNode *IntLL_unshift(IntLL *list, Polynomial p)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  CharNode *new_node = CharNode_create(value);
+  IntNode *new_node = IntNode_create(p);
   if (list->length != 0) {
     new_node->next = list->head;
   }
   list->head = new_node;
   list->length++;
-  return list;
+  return new_node;
 }
 
-CharLL *CharLL_pop(CharLL *list)
+Polynomial IntLL_pop(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (CharLL_is_empty(list)) {
+  if (IntLL_is_empty(list)) {
     LL_error(LIST_EMPTY);
-    return list;
+    return list->head->value;
   }
-  CharNode *current = list->head;
+  IntNode *current = list->head;
   int length = list->length;
   while (length - 2)
   {
     current = current->next;
     length--;
   }
-  CharNode_destroy(current->next);
+  Polynomial p = current->next->value;
+  IntNode_destroy(current->next);
   current->next = NULL;
   list->length--;
-  return list;
+  return p;
 }
 
-CharLL *CharLL_shift(CharLL *list)
+Polynomial IntLL_shift(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (CharLL_is_empty(list)) {
+  if (IntLL_is_empty(list)) {
     LL_error(LIST_EMPTY);
-    return list;
+    return list->head->value;
   }
-  CharNode *new_node_head = list->head->next;
-  CharNode_destroy(list->head);
+  if (list->length == 1) {
+    list->length = 0;
+    return list->head->value;
+  }
+  IntNode *new_node_head = list->head->next;
+  Polynomial p = list->head->value;
+  IntNode_destroy(list->head);
   list->head = new_node_head;
   list->length--;
-  return list;
+  return p;
 }
 
-void CharLL_print(CharLL *list)
+void IntLL_print(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
@@ -155,34 +173,36 @@ void CharLL_print(CharLL *list)
   }
   if (list->length == 0) {
     LL_error(PRINT_EMPTY_LIST);
-  } 
-  CharNode *current = list->head;
-  while (current != NULL)
-  {
-    printf("\n%c", current->value);
-    current = current->next;
+  }
+  else {
+    IntNode *current = list->head;
+    while (current != NULL)
+    {
+      printf("\n%d", current->value);
+      current = current->next;
+    }
   }
   printf("\n");
 }
 
-CharLL *CharLL_insert(CharLL *list, char value, int index)
+IntLL *IntLL_insert(IntLL *list, Polynomial p, int index)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  CharNode *new_node = CharNode_create(value);
+  IntNode *new_node = IntNode_create(p);
+  if (IntLL_is_empty(list))
+  {
+    list->head = new_node;
+  }
   if (index < 0 || index > list->length) {
     LL_error(OUT_OF_BOUNDS);
     return list;
   }
-  if (CharLL_is_empty(list))
-  {
-    list->head = new_node;
-  }
   else
   {
-    CharNode *current = list->head;
+    IntNode *current = list->head;
     int length = list->length;
     if (index > 0)
     {
@@ -192,7 +212,7 @@ CharLL *CharLL_insert(CharLL *list, char value, int index)
         current = current->next;
         index--;
       }
-      CharNode *old = current->next;
+      IntNode *old = current->next;
       new_node->next = old;
       current->next = new_node;
     }
@@ -206,13 +226,13 @@ CharLL *CharLL_insert(CharLL *list, char value, int index)
   return list;
 }
 
-CharLL *CharLL_delete(CharLL *list, int index)
+IntLL *IntLL_delete(IntLL *list, int index)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (CharLL_is_empty(list))
+  if (IntLL_is_empty(list))
   {
     LL_error(LIST_EMPTY);
     return list;
@@ -223,7 +243,7 @@ CharLL *CharLL_delete(CharLL *list, int index)
   }
   else
   {
-    CharNode *current = list->head;
+    IntNode *current = list->head;
     if (index > 0)
     {
 
@@ -233,33 +253,33 @@ CharLL *CharLL_delete(CharLL *list, int index)
         index--;
       }
 
-      CharNode *to_delete = current->next;
+      IntNode *to_delete = current->next;
       current->next = to_delete->next;
-      CharNode_destroy(to_delete);
+      IntNode_destroy(to_delete);
     }
     else
     {
       list->head = current->next;
-      CharNode_destroy(current);
+      IntNode_destroy(current);
     }
   }
   list->length--;
   return list;
 }
 
-CharLL *CharLL_reverse(CharLL *list)
+IntLL *IntLL_reverse(IntLL *list)
 {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  CharNode *prev = NULL;
-  CharNode *current = list->head;
+  IntNode *prev = NULL;
+  IntNode *current = list->head;
 
   while (current->next != NULL)
   {
-    CharNode *next_copy = current->next;
-    CharNode *current_copy = current;
+    IntNode *next_copy = current->next;
+    IntNode *current_copy = current;
     current->next = prev;
     current = next_copy;
     prev = current_copy;
@@ -269,22 +289,21 @@ CharLL *CharLL_reverse(CharLL *list)
   return list;
 }
 
-
-char CharLL_get (CharLL *list, int index) {
+Polynomial IntLL_get (IntLL *list, int index) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (CharLL_is_empty(list)) {
+  if (IntLL_is_empty(list)) {
     LL_error(LIST_EMPTY);
-    return '\0';
+    return list->head->value;
   }
   if (index < 0 || index > list->length - 1) {
     LL_error(OUT_OF_BOUNDS);
-    return '\0';
+    return list->head->value;
   }
 
-  CharNode* current = list->head;
+  IntNode* current = list->head;
 
   while (index) {
     current = current->next;
@@ -294,27 +313,24 @@ char CharLL_get (CharLL *list, int index) {
   return current->value;
 }
 
-CharLL *CharLL_set(CharLL *list, char value, int index) {
+IntLL *IntLL_set(IntLL *list, Polynomial p, int index) {
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-    if (CharLL_is_empty(list)) {
-      LL_error(LIST_EMPTY);
-      return list;
-    }
+  if (IntLL_is_empty(list)) return list;
   if (index < 0 || index > list->length - 1) {
     LL_error(OUT_OF_BOUNDS);
     return list;
   }
 
-  CharNode* current = list->head;
+  IntNode* current = list->head;
 
   while (index) {
     current = current->next;
     index--;
   }
 
-  current->value = value;
+  current->value = p;
   return list;
 }
