@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#define MAX_LENGTH 10
+#define MAX_LENGTH 5
 
 typedef struct
 {
@@ -80,7 +80,6 @@ DEQueue DEQueue_add_rear(DEQueue q, int el)
   }
   else
   {
-
     q.rear = get_index(q.rear + 1);
   }
   q.items[q.rear] = el;
@@ -101,6 +100,15 @@ DEQueue DEQueue_remove_rear(DEQueue q)
   q.items[q.rear] = 0;
   q.rear = get_index(q.rear - 1);
   return q;
+}
+
+int DEQueue_get (DEQueue q, int index) {
+  if (DEQueue_is_empty(q))
+    return -1;
+  if (index < 0 || index >= MAX_LENGTH) {
+    return -1;
+  }
+  return q.items[q.front + index];
 }
 
 void DEQueue_display(DEQueue q)
@@ -134,17 +142,92 @@ void DEQueue_display(DEQueue q)
   printf("\n");
 }
 
+int DEQueue_get_front (DEQueue q) {
+  return q.items[q.front];
+}
+
+int DEQueue_get_rear (DEQueue q) {
+  return q.items[q.rear];
+}
+
+int DEQueue_display_minimal (DEQueue q) {
+  int index = q.front;
+  if (q.rear == -1) {
+    while (index != MAX_LENGTH - 1) {
+      // printf("%d %d\n\n", q.front, q.rear);
+      printf("%d ", q.items[index]);
+      index = get_index(index + 1);
+    }
+  } else {
+    while (index != q.rear) {
+      // printf("%d %d\n\n", q.front, q.rear);
+      printf("%d ", q.items[index]);
+      index = get_index(index + 1);
+    }
+  }
+  printf("%d ", q.items[index]);
+}
+
 int main()
 {
+
+  int operation;
+  int temp;
   DEQueue q = DEQueue_create();
-  DEQueue_display(q);
-  q = DEQueue_add_front(q, 1);
-  DEQueue_display(q);
-  q = DEQueue_add_rear(q, 2);
-  DEQueue_display(q);
-  q = DEQueue_add_front(q, 2);
-  DEQueue_display(q);
-  q = DEQueue_remove_front(q);
-  q = DEQueue_remove_front(q);
-  DEQueue_display(q);
+  while (1) {
+
+    scanf("%d%*c", &operation);
+
+    switch (operation) {
+      case 1:
+        if (DEQueue_is_full(q)) {
+          printf("full ");
+        }
+        else {
+          scanf("%d%*c", &temp);
+          q = DEQueue_add_front(q, temp);
+        }
+        break;
+      case 2:
+      if (DEQueue_is_full(q)) {
+          printf("full ");
+        }
+        else {
+
+        scanf("%d%*c", &temp);
+        q = DEQueue_add_rear(q, temp);
+        }
+        break;
+      case 3:
+        if (DEQueue_is_empty(q)) {
+          printf("empty ");
+        }
+        else {
+          printf("%d ", DEQueue_get_front(q));
+        q = DEQueue_remove_front(q);
+        }
+        break;
+      case 4:
+        if (DEQueue_is_empty(q)) {
+          printf("empty ");
+        }
+        else {
+          printf("%d ", DEQueue_get_rear(q));
+          q = DEQueue_remove_rear(q);
+        }
+        break;
+      case 5:
+        if (DEQueue_is_empty(q)) {
+          printf("empty ");
+        }
+        else {
+          DEQueue_display_minimal(q);
+        }
+        break;
+      default:
+        return 0;
+    }
+
+  }
+
 }
