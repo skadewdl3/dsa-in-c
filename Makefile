@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./linked-list/polynomial-parsing/polynomial-parsing.c -o ./linked-list/polynomial-parsing/polynomial-parsing.sh -lm
+	gcc ./searching/binary-search.c -o ./searching/binary-search.sh -lm
 clean:
-	rm -rf ./linked-list/polynomial-parsing/polynomial-parsing.sh
+	rm -rf ./searching/binary-search.sh
 run:
-	./linked-list/polynomial-parsing/polynomial-parsing.sh
+	./searching/binary-search.sh
