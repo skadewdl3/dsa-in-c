@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./sorting/selection-sort.c -o ./sorting/selection-sort.sh -lm
+	gcc ./sorting/radix-sort.c -o ./sorting/radix-sort.sh -lm
 clean:
-	rm -rf ./sorting/selection-sort.sh
+	rm -rf ./sorting/radix-sort.sh
 run:
-	./sorting/selection-sort.sh
+	./sorting/radix-sort.sh
