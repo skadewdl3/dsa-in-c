@@ -9,7 +9,7 @@
 #define true 1
 
 typedef enum {
-  USER, COMP
+  USER, COMP, NONE
 } Player;
 
 // prints the board
@@ -29,11 +29,11 @@ int is_number_crossed (SLL** rows, int length, int number) {
   for (int i = 0; i < length; i++) {
     for (int j = 0; j < length; j++) {
       if (get(rows[i], j) == number) {
-        return 1;
+        return 0;
       }
     }
   }
-  return 0;
+  return 1;
 }
 
 void cross_number (SLL** row, int length, int number) {
@@ -47,46 +47,64 @@ void cross_number (SLL** row, int length, int number) {
 }
 
 // checks whether the board is a bingo or not
-int check_bingo(SLL** rowData, int dim)
+int check_bingo(SLL** rows, int dim)
 {
 
-    int rows[dim];
-    int cols[dim];
+  // i represents rows
+  // j represents columns
+  // in all three cases
 
+
+  // rows
+  for (int i = 0; i < dim; i++) {
+    int cross_count = 0;
+    for (int j = 0; j < dim; j++) {
+      if (get(rows[i], j) == X) {
+        cross_count++;
+      }
+    }
+    if (cross_count == dim) {
+      return 1;
+    }
+  }
+
+  // columns
+  for (int j = 0; j < dim; j++) {
+    int cross_count = 0;
     for (int i = 0; i < dim; i++) {
-        rows[i] = 0;
-        cols[i] = 0;
+      if (get(rows[i], j) == X) {
+        cross_count++;
+      }
+    }
+    if (cross_count == dim) {
+      return 1;
+    }
+  }
+
+  //diags
+  // diag1 is topleft to bottomright
+  // diag2 is topright to bottomleft
+  int cross_count_diag1 = 0;
+  int cross_count_diag2 = 0;
+
+  for (int i = 0; i < dim; i++) {
+    // check diag1 for cross
+    if (get(rows[i], i) == X) {
+      cross_count_diag1++;
     }
 
-    int diag1 = 0;
-    int diag2 = 0;
-
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            if (is_crossed(rowData, dim, i, j)) {
-                rows[i]++;
-                cols[j]++;
-                if (i == j) {
-                    diag1++;
-                }
-                if (i + j == dim - 1) {
-                    diag2++;
-                }
-            }
-        }
+    // check diag2 for cross
+    if (get(rows[i], dim - i - 1) == X) {
+      cross_count_diag2++;
     }
+  }
 
-    for (int i = 0; i < dim; i++) {
-        if (rows[i] == dim || cols[i] == dim) {
-            return 1;
-        }
-    }
+  if (cross_count_diag1 == dim || cross_count_diag2 == dim) {
+    return 1;
+  }
 
-    if (diag1 == dim || diag2 == dim) {
-        return 1;
-    }
 
-    return 0;
+  return 0;
 }
 
 SLL** create_user_board (int dim) {
@@ -103,8 +121,11 @@ SLL** create_user_board (int dim) {
   
   // get values of inputs from user
   while (numbers_count < dim * dim) {
-    print_board(rows, dim, true);
-    printf("Enter number at: (%d, %d)", numbers_count / dim, numbers_count % dim);
+    system("clear");
+    printf("\nFill your board with numbers under 50.\n");
+    print_board(rows, dim, false);
+    printf("\n");
+    printf("Enter number at (%d, %d): ", numbers_count / dim, numbers_count % dim);
     scanf("%d%*c", &numbers[numbers_count]);
     replace(rows[numbers_count / dim], numbers[numbers_count], numbers_count % dim);
     numbers_count++;
@@ -113,17 +134,21 @@ SLL** create_user_board (int dim) {
   return rows;
 }
 
-SLL** create_computer_board (int dim) {
+SLL** create_computer_board (SLL** rows_user, int dim) {
+
+
+
   SLL** rows = malloc(dim * sizeof(SLL*));
   int numbers[dim * dim];
     // creating dim number of lists
   for (int i = 0; i < dim; i++) {
     rows[i] = createList();
   }
+  
   // filling numbers array with 1 to dim * dum
   for (int i = 0; i < dim; i++) {
     for (int j = 0; j < dim; j++) {
-      numbers[i * dim + j] = i * dim + j + 1;
+      numbers[i * dim + j] = get(rows_user[i], j);
     }
   }
 
@@ -167,7 +192,7 @@ int main () {
 
   // creates user and computer boards
   SLL** rows_user = create_user_board(dim);
-  SLL** rows_comp = create_computer_board(dim);
+  SLL** rows_comp = create_computer_board(rows_user, dim);
 
   // randomises computer calls
   int* computer_calls = (int*)malloc(dim * dim * sizeof(int));
@@ -183,21 +208,23 @@ int main () {
 
   // user calls a number first
   Player caller = USER;
+  Player winner = USER;
   int called;
   int num_calls = 0;
 
   // game loop
-  while (!check_bingo(rows_comp, dim) && !check_bingo(rows_user, dim)) {
+  while (1) {
+    system("clear");
     printf("\nYour board: \n");
-    print_board(rows_user, dim, true);
-    printf("\nComputers board: \n");
-    print_board(rows_comp, dim, false);
+    print_board(rows_user, dim, false);
+    // printf("\nComputers board: \n");
+    // print_board(rows_comp, dim, false);
 
     if (caller == USER) {
       printf("Call your number: ");
       scanf("%d%*c", &called);
-      while (is_number_crossed(rows_user, dim * dim, called)) {
-        num_calls++;
+      printf("\nyou called: %d", called);
+      while (is_number_crossed(rows_user, dim, called)) {
         printf("Call another number: ");
         scanf("%d%*c", &called);
       }
@@ -206,11 +233,11 @@ int main () {
       caller = COMP;
     }
 
-    else if (caller = COMP) {
+    else if (caller == COMP) {
       printf("Press enter for computer to call next number: ");
       getchar();
       called = computer_calls[num_calls];
-      while (is_number_crossed(rows_comp, dim * dim, called)) {
+      while (is_number_crossed(rows_comp, dim, called)) {
         num_calls++;
         called = computer_calls[num_calls];
       }
@@ -219,9 +246,53 @@ int main () {
       cross_number(rows_comp, dim, called);
       caller = USER;
     }
+
+    int comp_bingo = check_bingo(rows_comp, dim);
+    int user_bingo = check_bingo(rows_user, dim);
+
+    if (comp_bingo && user_bingo) {
+      winner = NONE;
+      break;
+    }
+    else if (comp_bingo) {
+      winner = COMP;
+      break;
+    }
+    else if (user_bingo) {
+      winner = USER;
+      break;
+    }
+  }
+
+  printf("\nBINGO!\n");
+  if (winner == NONE) {
+    system("clear");
+    printf("Draw!\n\n");
+    printf("Your board: \n");
+    print_board(rows_user, dim, false);
+    printf("Computers board: \n");
+    print_board(rows_comp, dim, false);
+  }
+  else if (winner == USER) {
+    system("clear");
+    printf("You won!\n\n");
+    printf("Your board: \n");
+    print_board(rows_user, dim, false);
+    printf("Computers board: \n");
+    print_board(rows_comp, dim, false);
+  }
+  else if (winner == COMP) {
+    system("clear");
+    printf("Computer won!\n\n");
+    printf("Your board: \n");
+    print_board(rows_user, dim, false);
+    printf("Computers board: \n");
+    print_board(rows_comp, dim, false);
   }
 
   
+
+}
 
 
   // shuffling the numbers to be called
@@ -247,8 +318,6 @@ int main () {
   //   num_calls++;
   // }
   // print_board(rows_comp, dim);
-}
-
 
 /*
 if dim = 3

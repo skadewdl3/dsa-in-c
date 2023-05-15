@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define RED "\x1b[31m"
+#define RESET "\x1b[m"
+
 typedef struct node
 {
   int info;
@@ -148,7 +151,7 @@ void print_list(SLL *list) {
   SLLNode *temp = list->head;
   while(temp != NULL) {
     if (temp->info == 88) {
-      printf("  X ");
+      printf(RED "  X " RESET);
     }
     else if (temp->info == 95) {
       printf("  _ ");
