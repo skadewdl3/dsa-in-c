@@ -26,7 +26,7 @@ def sum (array):                    # counter += 0
 # Hence, complexity = O(n)
 ```
 
-### Frequency count (how many times a line of code is executed)
+### Frequency count (how many times a line of code is to be executed)
 - __Function declaration__: counter += 0
 - __Function call__: counter += 1
 - __Variable declaration (and initialisation)__: counter += 1 (no matter the number of variables, all are initialised/declared all together)
