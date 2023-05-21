@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./bingo/main.c -o ./bingo/main.sh -lm
+	gcc ./sorting/quick-sort.c -o ./sorting/quick-sort.sh -lm
 clean:
-	rm -rf ./bingo/main.sh
+	rm -rf ./sorting/quick-sort.sh
 run:
-	./bingo/main.sh
+	./sorting/quick-sort.sh

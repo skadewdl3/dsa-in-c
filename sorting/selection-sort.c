@@ -8,7 +8,6 @@ void selection_sort (int* array, int length) {
         min_index = j;
       }
     }
-    if (min_index == i) break;
     int temp = array[i];
     array[i] = array[min_index];
     array[min_index] = temp;
@@ -17,8 +16,13 @@ void selection_sort (int* array, int length) {
 
 int main () {
 
-  int array[] = {1, 4, 5, 0, -1, 29, 67};
-  int length = 7;
+  int length;
+  int key;
+  scanf("%d%*c", &length);
+  int array[length];
+  for (int i = 0; i < length; i++) {
+    scanf("%d%*c", &array[i]);
+  }
 
   selection_sort(array, length);
   for (int i = 0; i < length; i++) {

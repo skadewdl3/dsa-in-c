@@ -34,18 +34,23 @@ int binary_search (int* array, int length, int key) {
 }
 
 int main () {
-  
-  int array[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  int length = 8;
-  int key = 7;
 
-  bubble_sort(array, length);
+  int length;
+  int key;
+  scanf("%d%*c", &length);
+  int array[length];
+  for (int i = 0; i < length; i++) {
+    scanf("%d%*c", &array[i]);
+  }
+  scanf("%d%*c", &key);
+
+  // bubble_sort(array, length);
   int index = binary_search(array, length, key);
 
   if (index == -1) {
-    printf("Key not found\n");
+    printf("absent\n");
   } else {
-    printf("Key found at index %d\n", index);
+    printf("present at %d index\n", index);
   }
 
 }

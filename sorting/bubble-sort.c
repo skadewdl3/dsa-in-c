@@ -17,8 +17,12 @@ void bubble_sort (int* array, int length) {
 
 int main () {
 
-  int array[] = {1, 4, 5, 0, -1, 29, 67};
-  int length = 7;
+  int length;
+  scanf("%d%*c", &length);
+  int array[length];
+  for (int i = 0; i < length; i++) {
+    scanf("%d%*c", &array[i]);
+  }
 
   bubble_sort(array, length);
   for (int i = 0; i < length; i++) {

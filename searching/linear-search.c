@@ -1,27 +1,52 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-int linear_search (int* array, int length, int key) {
+typedef struct {
+  int count;
+  int* values;
+} Result;
+
+Result* linear_search (int* array, int length, int key) {
+  Result* result = malloc(sizeof(Result));
+  result->count = 0;
+  result->values = NULL;
+
   for (int i = 0; i < length; i++) {
     if (array[i] == key) {
-      return i;
+      if (result->count == 0) {
+        result->values = malloc(sizeof(int));
+      } else {
+        result->values = realloc(result->values, sizeof(int) * (result->count + 1));
+      }
+      result->values[result->count] = i;
+      result->count++;
     }
   }
-  return -1;
+  return result;
 }
 
 int main () {
 
 
-  int array[] = {1, 2, 3, 4, 5, 6, 7, 8};
-  int length = 8;
-  int key = 7;
+  int length;
+  int key;
+  scanf("%d%*c", &length);
+  int array[length];
+  for (int i = 0; i < length; i++) {
+    scanf("%d%*c", &array[i]);
+  }
+  scanf("%d%*c", &key);
 
-  int index = linear_search(array, length, key);
 
-  if (index == -1) {
-    printf("Key not found\n");
-  } else {
-    printf("Key found at index %d\n", index);
+  Result* result = linear_search(array, length, key);
+
+  if (result->count == 0) {
+    printf("absent\n");
+  }
+  else {
+    for (int i = 0; i < result->count; i++) {
+      printf("present at %d position\n", result->values[i] + 1);
+    }
   }
 
 }

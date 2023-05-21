@@ -1,342 +1,294 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define ERROR_TEXT_COLOR "\x1b[31m"
-#define ERROR_WARNING_COLOR "\x1b[33m"
-#define ERROR_INFO_COLOR "\x1b[34m"
-#define ERROR_RESET_COLOR "\x1b[m"
+struct station 
+{
+    char name[25];
+    int station_no;
+    float distance;
+    struct station *prev;
+    struct station *next;
+};
+struct station PCMC, STN, BHOSARI, KASARWADI, PHUGEWADI ,DAPODI ,BOPODI ,KHADKI ,RANGE_HILL ,SHIVAJINAGAR, CIVIL_COURT, BP, MANDAI, SWARGATE;
+struct station *head;
+struct station *tail;
+struct station *temp;
+struct station *start_st;
+struct station *end_st;
+char start[25], end[25];
 
-typedef enum {
-  MEM_ALLOC_ERROR, OUT_OF_BOUNDS, LIST_EMPTY, LIST_DESTROYED
-} LL_errors;
+void to_UpperCase(char *str);
+struct station *station_search(char *destination);
+void assign_destinations(char *tart, char *end);
+void print_route(char *start, char *end);
+void travel(char *start, char *end);
+void dist_fare(char *start, char *end);
+int fare(float distance);
 
-void LL_print_error (char* type, char* message, char* solution) {
-  printf(ERROR_TEXT_COLOR "\n%s:\n" ERROR_RESET_COLOR "%s\n" ERROR_INFO_COLOR "%s\n" ERROR_RESET_COLOR, type, message, solution);
-}
+int main()
+{
+    strcpy(PCMC.name, "PCMC");
+    PCMC.station_no = 0;
+    PCMC.distance = 2;
+    PCMC.prev = NULL;
+    PCMC.next = &STN;
 
-
-void LL_print_warning (char* type, char* message, char* solution) {
-  printf(ERROR_WARNING_COLOR "\n%s:\n" ERROR_RESET_COLOR "%s\n" ERROR_INFO_COLOR "%s\n" ERROR_RESET_COLOR, type, message, solution);
-}
-
-
-void LL_print_info (char* type, char* message, char* solution) {
-  printf(ERROR_INFO_COLOR "\n%s:\n" ERROR_RESET_COLOR "%s\n" ERROR_INFO_COLOR "%s\n" ERROR_RESET_COLOR, type, message, solution);
-}
-
-void LL_error (LL_errors error_code) {
-  switch (error_code) {
-    case MEM_ALLOC_ERROR:
-      LL_print_error("Runtime Error", "Memory allocation using malloc failed.", "Try freeing up some memory.");
-      break;
-    case OUT_OF_BOUNDS:
-      LL_print_warning("Logical Error", "Index out of bounds. You tried accessing an element past the end of the list or before the beginning of the list.", "Try checking the index that you are accessing.");
-      break;
-    case LIST_EMPTY:
-      LL_print_warning("Logical Error", "The list is empty. You cannot get/set an element in an empty list.", "Try adding an element to the list (push, insert, etc.) before trying to get/set an element.");
-      break;
-    case LIST_DESTROYED:
-      LL_print_error("Logical Error", "You tried access the list after it has been destroyed.", "Try creating a new list or check for unintended LL_destroy calls.");
-      break;
+    strcpy(STN.name, "Sant Tukaram Nagar");
+    STN.station_no = 1;
+    STN.distance = 0.65;
+    STN.prev = &PCMC;
+    STN.next = &BHOSARI;
     
-}
-}
+    strcpy(BHOSARI.name, "BHOSARI");
+    BHOSARI.station_no=2;
+    BHOSARI.distance = 1.5;
+    BHOSARI.prev = &STN;
+    BHOSARI.next = &KASARWADI;
+    
+    strcpy(KASARWADI.name, "KASARWADI");
+    KASARWADI.station_no = 3;
+    KASARWADI.distance = 1.1;
+    KASARWADI.prev = &BHOSARI;
+    KASARWADI.next = &PHUGEWADI;
+    
+    strcpy(PHUGEWADI.name, "PHUGEWADI");
+    PHUGEWADI.station_no = 4;
+    PHUGEWADI.distance = 0.8;
+    PHUGEWADI.prev = &KASARWADI;
+    PHUGEWADI.next = &DAPODI;
+    
+    strcpy(DAPODI.name , "DAPODI");
+    DAPODI.station_no = 5;
+    DAPODI.distance = 1.6;
+    DAPODI.prev = &PHUGEWADI;
+    DAPODI.next = &BOPODI;
+    
+    strcpy(BOPODI.name, "BOPODI");
+    BOPODI.station_no = 6;
+    BOPODI.distance = 1.4;
+    BOPODI.prev = &DAPODI;
+    BOPODI.next = &KHADKI;
+    
+    strcpy(KHADKI.name, "KHADKI");
+    KHADKI.station_no = 7;
+    KHADKI.distance = 1.4;
+    KHADKI.prev = &BOPODI;
+    KHADKI.next = &RANGE_HILL;
 
-typedef struct IntLLNode
-{
-  int value;
-  struct IntLLNode *next;
-  struct IntLLNode *prev;
-} IntNode;
+    strcpy(RANGE_HILL.name, "RANGE HILL");
+    RANGE_HILL.station_no = 8;
+    RANGE_HILL.distance = 5.5;
+    RANGE_HILL.prev = &KHADKI;
+    RANGE_HILL.next = &SHIVAJINAGAR;
 
-typedef struct
-{
-  int length;
-  IntNode *head;
-} IntLL;
+    strcpy(SHIVAJINAGAR.name, "SHIVAJINAGAR");
+    SHIVAJINAGAR.station_no = 9;
+    SHIVAJINAGAR.distance = 1.4;
+    SHIVAJINAGAR.prev = &RANGE_HILL;
+    SHIVAJINAGAR.next = &CIVIL_COURT;
 
-IntNode *IntNode_create(int val)
-{
-  IntNode *v = (IntNode *)malloc(sizeof(IntNode));
-  if (v == NULL) {
-    LL_error(MEM_ALLOC_ERROR);
-    exit(1);
-  }
-  v->next = NULL;
-  v->prev = NULL;
-  v->value = val;
-  return v;
-}
+    strcpy(CIVIL_COURT.name, "CIVIL COURT");
+    CIVIL_COURT.station_no = 10;
+    CIVIL_COURT.distance = 1.7;
+    CIVIL_COURT.prev = &SHIVAJINAGAR;
+    CIVIL_COURT.next = &BP;
 
-void IntNode_destroy(IntNode *node)
-{
-  free(node);
-}
+    strcpy(BP.name, "BP");
+    BP.station_no = 11;
+    BP.distance = 0.6;
+    BP.prev = &CIVIL_COURT;
+    BP.next = &MANDAI;
 
-IntLL *IntLL_create()
-{
-  IntLL *list = (IntLL*)malloc(sizeof(IntLL));
-  IntNode *head = IntNode_create(0);
-  list->head = head;
-  list->length = 0;
-  return list;
-}
+    strcpy(MANDAI.name, "MANDAI");
+    MANDAI.station_no = 12;
+    MANDAI.distance = 1.5;
+    MANDAI.prev = &BP;
+    MANDAI.next = &SWARGATE;
 
-void IntLL_destroy(IntLL *list)
-{
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  IntNode *prev = NULL;
-  IntNode *current = list->head;
+    strcpy(SWARGATE.name, "SWARGATE");
+    SWARGATE.station_no = 13;
+    SWARGATE.distance = 0;
+    SWARGATE.prev = &MANDAI;
+    SWARGATE.next = NULL;
 
-  for (int i = 0; i < list->length - 1; i++) {
-    prev = current;
-    current = current->next;
-    IntNode_destroy(prev);
-  }
-  
-  IntNode_destroy(current);
-  free(list);
-  list->head = NULL;
-}
+    head = &PCMC;
+    tail = &SWARGATE;
 
-int IntLL_is_empty(IntLL *list)
-{
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    exit(1);
-  }
-  return list->length == 0;
-}
-
-void IntLL_push (IntLL *list, int value) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    return;
-  }
-  IntNode *node = IntNode_create(value);
-  if (list->length == 0) {
-    node->prev = node;
-    node->next = node;
-    list->head = node;
-  }
-  else {
-    IntNode *current = list->head;
-    for (int i = 0; i < list->length - 1; i++) {
-      current = current->next;
-    }
-    // link node with head
-    node->next = list->head;
-    list->head->prev = node;
-
-    // link node with current
-    node->prev = current;
-    current->next = node;
-  }
-  list->length++; 
-}
-
-void IntLL_pop (IntLL *list) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    return;
-  }
-  if (list->length == 0) {
-    LL_error(LIST_EMPTY);
-    return;
-  }
-  if (list->length == 1) {
-    IntNode_destroy(list->head);
-    list->head = IntNode_create(0);
-    list->length = 0;
-    return;
-  }
-  IntNode *current = list->head;
-  for (int i = 0; i < list->length - 1; i++) {
-    current = current->next;
-  }
-  
-  IntNode *prev = current->prev;
-  prev->next = list->head;
-  list->head->prev = prev;
-  IntNode_destroy(current);
-  list->length--;
-}
-
-void IntLL_insert (IntLL *list, int value, int index) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    return;
-  }
-  if (index < 0 || index > list->length) {
-    LL_error(OUT_OF_BOUNDS);
-    return;
-  }
-
-  IntNode *new_node = IntNode_create(value);
-
-  if (index == 0) {
-    IntNode *next = list->head->next;
-    IntNode *prev = list->head->prev;
-    new_node->prev = prev;
-    new_node->next = list->head;
-    list->head = new_node;
-  }
-  else {
-    IntNode *current = list->head;
-    for (int i = 0; i < index; i++) {
-      current = current->next;
-    }
-    IntNode *prev = current->prev;
-    new_node->prev = prev;
-    new_node->next = current;
-    prev->next = new_node;
-    current->prev = new_node;
-  }
-  list->length++;
-} 
-
-int IntLL_delete (IntLL *list, int index) {
-  
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    return;
-  }
-  if (index < 0 || index >= list->length) {
-    LL_error(OUT_OF_BOUNDS);
-    return;
-  }
-  if (list->length == 0) {
-    LL_error(LIST_EMPTY);
-    return;
-  }
-  if (list->length == 1) {
-    IntNode_destroy(list->head);
-    list->head = IntNode_create(0);
-    list->length = 0;
-    return;
-  }
-  if (index == 0) {
-    IntNode *current = list->head;
-    IntNode *next = current->next;
-    IntNode *prev = current->prev;
-    list->head = next;
-    IntNode_destroy(current);
-  }
-  else {
-    IntNode *current = list->head;
-    for (int i = 0; i < index; i++) {
-      current = current->next;
-    }
-    IntNode *prev = current->prev;
-    IntNode *next = current->next;
-    prev->next = next;
-    next->prev = prev;
-    IntNode_destroy(current);
-  }
-  list->length--;
-}
-
-void IntLL_print (IntLL *list) {
-  if (list->head == NULL) {
-    LL_error(LIST_DESTROYED);
-    return;
-  }
-  if (list->length == 0) {
-    printf("\nThe list is empty.");
-  }
-  IntNode *current = list->head;
-  for (int i = 0; i < list->length; i++) {
-    printf("%d ", current->value);
-    current = current->next;
-  }
-}
-
-int IntLL_search (IntLL *list, int value) {
-    if (list->head == NULL) {
-        LL_error(LIST_DESTROYED);
-        return -1;
-    }
-    if (list->length == 0) {
-        printf("\nThe list is empty.");
-        return -1;
-    }
-    IntNode *current = list->head;
-    for (int i = 0; i < list->length; i++) {
-        if (current->value == value) {
-            return i;
-        }
-        current = current->next;
-    }
-    return -1;
-}
-
-int main () {
-
-    IntLL* list = IntLL_create();
-
-    int choice;
-    int operand1;
-    int operand2;
-    int index;
-
-    while (1) {
+    int choice; 
+    do
+    {  
+        printf("1. \n2. Fare\n3. Print Route\n4. Exit\n");
         scanf("%d%*c", &choice);
-        switch (choice) {
+        switch(choice)
+        {
             case 1:
-                scanf("%d%*c", &operand1);
-                IntLL_insert(list, operand1, 0);
                 break;
             case 2:
-                scanf("%d%*c", &operand1);
-                IntLL_push(list, operand1);
+                printf("Enter the starting station: ");
+                scanf("%[^\n]%*c", start);
+                printf("Enter the destination station: ");
+                scanf("%[^\n]", end);
+                dist_fare(start, end);
                 break;
             case 3:
-                scanf("%d", &operand1);
-                int index = IntLL_search(list, operand1);
-                scanf("%d", &operand2);
-                IntLL_insert(list, operand2, index + 1);
+                printf("Enter the starting station:");
+                scanf("%s", start);
+                // gets(start);
+                printf("Enter the destination station:");
+                scanf("%s", end);
+                // gets(end);
+                print_route(start, end);
                 break;
             case 4:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                printf("%d ", IntLL_delete(list, 0))
-                break;
-                
-            case 5:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                printf("%d ", IntLL_pop(list));
-                break;
-                
-            case 6:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                scanf("%d", &operand1);
-                index = IntLL_search(list, operand1);
-                printf("%d ", IntLL_delete(list, index + 1));
-                break;
-            case 7:
-                if (list->length == 0) {
-                    printf("empty ");
-                    break;
-                }
-                IntLL_print(list);
-                break;
-            case 8:
-                scanf("%d%*c", &operand1);
-                index = IntLL_search(list, operand1); 
-                if (index == -1) printf("absent ");
-                else printf("present at %d ", index + 1);
-                break;
-            case 9:
-                return 0;
+                exit(0);
+        }
+    }while(choice!=4);
+    return 0;
+}
+
+void to_UpperCase(char *str)
+{
+    int i;
+    for(i=0;str[i]!='\0';i++)
+        if(str[i]>='a'&& str[i]<='z')
+            str[i] = str[i]-32;
+}
+
+struct station *station_search(char *destination)
+{
+    to_UpperCase(destination);
+    temp = head;
+    while(temp!=NULL)
+    {
+        if(strcmp(temp->name, destination)==0)
+            return temp;
+        temp = temp->next;
+    }
+    return NULL;
+}
+
+void assign_destinations(char *start, char *end)
+{
+    start_st = station_search(start);
+    end_st = station_search(end);
+}
+
+void print_route(char *start, char *end)
+{
+    assign_destinations(start, end);
+    temp = start_st;
+    if(start_st->station_no < end_st->station_no)
+    {
+        while(temp!=end_st)
+        {
+            printf("%s ==> ", temp->name);
+            temp = temp->next;
+        }
+        printf("%s", temp->name);
+        printf("\n");
+    }
+    else if(start_st->station_no > end_st->station_no)
+    {
+        while(temp!=end_st)
+        {
+            printf("%s ==> ", temp->name);
+            temp = temp->prev;
+        }
+        printf("%s", temp->name);
+        printf("\n");
+    }
+    else
+        printf("You are already at %s\n", start);
+}
+
+int fare(float distance)
+{
+    if (distance<=2)
+        return 10;
+    else if(distance>2 && distance<=4)
+        return 20;
+    else if(distance>4 && distance<=12)
+        return 30;
+    else if(distance>12 && distance<=18)
+        return 40;
+    else if(distance>18)
+        return 50;
+    else
+        return 0;  
+}
+
+void dist_fare(char *start, char *end)
+{
+    int money = 0;
+    float total_distance = 0;
+    assign_destinations(start, end);
+    temp = start_st;
+    if(start_st->station_no < end_st->station_no)
+    {
+        printf("down case \n");
+        while(temp!=end_st)
+        {
+            total_distance = total_distance + temp->distance;
+            temp = temp->next;
+        }
+        printf("Distance = %.2f km\n", total_distance);
+        money = fare(total_distance);
+        printf("Fare = Rs %d\n", money);
+    }
+    else if(start_st->station_no > end_st->station_no)
+    {
+        printf("up case\n");
+        while(temp!=end_st)
+        {
+            temp = temp->prev;
+            total_distance = total_distance + temp->distance;
+        }
+        printf("Distance of your journey is %.2f\n", total_distance);
+        money = fare(total_distance);
+        printf("Fare = Rs %d\n", money);
+    }
+    else
+        printf("You are already at %s\n", start);
+}
+
+// void travel(char start[], char end[])
+// {
+//     print_route(char start[], char end[]);
+//     dist_fare(char start[], char end[]);
+// }
+
+/*
+USE A MULTI DIMENSIONAL ARRAY TO STORE THE STATIONS
+
+void creation(int j,char name1[][50])
+{//printf("flag=5\n");
+    head[j]=NULL;
+     int i=0;
+   for(i=0;i<size[j];i++)
+    {
+struct station *new;
+new=(struct station*)malloc(sizeof(struct station));
+strcpy(new->name,name1[i]);
+new->number=i;
+new->next=NULL;
+new->right=NULL;
+if(head[j]==NULL)
+    {
+        head[j]=new;
+    }
+else
+    {
+
+    temp=head[j];
+    while(temp->right!=NULL)
+        {
+        temp=temp->right;
+        }
+        temp->right=new;
+
 
         }
-    }    
+    }
 }
+*/
