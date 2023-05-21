@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./sorting/quick-sort.c -o ./sorting/quick-sort.sh -lm
+	gcc ./stack-new/postfix/infix-to-postfix.c -o ./stack-new/postfix/infix-to-postfix.sh -lm
 clean:
-	rm -rf ./sorting/quick-sort.sh
+	rm -rf ./stack-new/postfix/infix-to-postfix.sh
 run:
-	./sorting/quick-sort.sh
+	./stack-new/postfix/infix-to-postfix.sh
