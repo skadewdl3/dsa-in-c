@@ -24,7 +24,7 @@ int is_operator (char operator) {
  
 
 int main () {
-  char infix[] = "(a+b/c)*(a/k^l)";
+  char infix[] = "a+b/c^d";
   int length = strlen(infix);
 
   char postfix[length];

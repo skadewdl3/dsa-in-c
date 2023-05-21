@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./stack-new/postfix/infix-to-postfix.c -o ./stack-new/postfix/infix-to-postfix.sh -lm
+	gcc ./stack-new/prefix/infix-to-prefix.c -o ./stack-new/prefix/infix-to-prefix.sh -lm
 clean:
-	rm -rf ./stack-new/postfix/infix-to-postfix.sh
+	rm -rf ./stack-new/prefix/infix-to-prefix.sh
 run:
-	./stack-new/postfix/infix-to-postfix.sh
+	./stack-new/prefix/infix-to-prefix.sh
