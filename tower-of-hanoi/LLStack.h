@@ -46,8 +46,6 @@ void LL_error (LL_errors error_code) {
 }
 }
 
-
-
 typedef struct IntLLNode
 {
   int value;
@@ -124,18 +122,15 @@ IntNode *IntLL_push(IntLL *list, int value)
   if (IntLL_is_empty(list))
   {
     list->head = new_node;
-    list->head->next = list->head;
   }
   else
   {
     IntNode *current = list->head;
-    for (int i = 0; i < list->length - 1; i++)
+    while (current->next != NULL)
     {
       current = current->next;
     }
-    new_node->next = list->head;
     current->next = new_node;
-    
   }
   list->length++;
   return new_node;
@@ -151,17 +146,8 @@ IntNode *IntLL_unshift(IntLL *list, int value)
   if (list->length != 0) {
     new_node->next = list->head;
   }
-  else {
-    new_node->next = new_node;
-  }
   list->head = new_node;
   list->length++;
-
-  IntNode *current = list->head;
-  for (int i = 0; i < list->length - 1; i++) {
-    current = current->next;
-  }
-  current->next = list->head;
   return new_node;
 }
 
@@ -184,7 +170,7 @@ int IntLL_pop(IntLL *list)
   }
   int value = current->next->value;
   IntNode_destroy(current->next);
-  current->next = list->head;
+  current->next = NULL;
   list->length--;
   return value;
 }
@@ -208,11 +194,6 @@ int IntLL_shift(IntLL *list)
   IntNode_destroy(list->head);
   list->head = new_node_head;
   list->length--;
-  IntNode *current = list->head;
-  for (int i = 0; i < list->length - 1; i++) {
-    current = current->next;
-  }
-  current->next = list->head;
   return value;
 }
 
@@ -222,17 +203,16 @@ void IntLL_print(IntLL *list)
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (list->length == 0) {
-    LL_error(PRINT_EMPTY_LIST);
-  }
+  if (list->length == 0) return;
   else {
     IntNode *current = list->head;
-    for (int i = 0; i < list->length; i++)
+    while (current != NULL)
     {
-      printf("%d ", current->value);
+      printf("\n%d", current->value);
       current = current->next;
     }
   }
+  printf("\n");
 }
 
 IntLL *IntLL_insert(IntLL *list, int value, int index)
@@ -245,7 +225,6 @@ IntLL *IntLL_insert(IntLL *list, int value, int index)
   if (IntLL_is_empty(list))
   {
     list->head = new_node;
-    list->head->next = list->head;
   }
   if (index < 0 || index > list->length) {
     LL_error(OUT_OF_BOUNDS);
@@ -269,16 +248,16 @@ IntLL *IntLL_insert(IntLL *list, int value, int index)
     }
     else
     {
-      IntLL_unshift(list, value);
+      new_node->next = current;
+      list->head = new_node;
     }
   }
   list->length++;
   return list;
 }
 
-int IntLL_delete(IntLL *list, int index)
+IntLL *IntLL_delete(IntLL *list, int index)
 {
-  int deleted = -1;
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
@@ -286,11 +265,11 @@ int IntLL_delete(IntLL *list, int index)
   if (IntLL_is_empty(list))
   {
     LL_error(LIST_EMPTY);
-    return deleted;
+    return list;
   }
   if (index < 0 || index > list->length - 1) {
     LL_error(OUT_OF_BOUNDS);
-    return deleted;
+    return list;
   }
   else
   {
@@ -305,99 +284,129 @@ int IntLL_delete(IntLL *list, int index)
       }
 
       IntNode *to_delete = current->next;
-      deleted = to_delete->value;
       current->next = to_delete->next;
       IntNode_destroy(to_delete);
     }
     else
     {
-      deleted = list->head->value;
       list->head = current->next;
       IntNode_destroy(current);
     }
   }
   list->length--;
-  return deleted;
+  return list;
 }
-int IntLL_search (IntLL* list, int value) {
+
+IntLL *IntLL_reverse(IntLL *list)
+{
   if (list->head == NULL) {
     LL_error(LIST_DESTROYED);
     exit(1);
   }
-  if (IntLL_is_empty(list)) return -1;
+  IntNode *prev = NULL;
+  IntNode *current = list->head;
 
-  IntNode* current = list->head;
-  for (int i = 0; i < list->length; i++) {
-    if (current->value == value) return i;
-    current = current->next;
+  while (current->next != NULL)
+  {
+    IntNode *next_copy = current->next;
+    IntNode *current_copy = current;
+    current->next = prev;
+    current = next_copy;
+    prev = current_copy;
   }
-  return -1;
+  current->next = prev;
+  list->head = current;
+  return list;
 }
 
-int main () {
+int IntLL_get (IntLL *list, int index) {
+  if (list->head == NULL) {
+    LL_error(LIST_DESTROYED);
+    exit(1);
+  }
+  if (IntLL_is_empty(list)) {
+    LL_error(LIST_EMPTY);
+    return -1;
+  }
+  if (index < 0 || index > list->length - 1) {
+    LL_error(OUT_OF_BOUNDS);
+    return -1;
+  }
 
-    IntLL* list = IntLL_create();
+  IntNode* current = list->head;
 
-    int choice;
-    int operand1;
-    int operand2;
-    int index;
+  while (index) {
+    current = current->next;
+    index--;
+  }
 
-    while (1) {
-        scanf("%d%*c", &choice);
-        switch (choice) {
-            case 1:
-                scanf("%d%*c", &operand1);
-                IntLL_unshift(list, operand1);
-                break;
-            case 2:
-                scanf("%d%*c", &operand1);
-                IntLL_push(list, operand1);
-                break;
-            case 3:
-                scanf("%d", &operand1);
-                int index = IntLL_search(list, operand1);
-                scanf("%d", &operand2);
-                IntLL_insert(list, operand2, index + 1);
-                break;
-            case 4:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                printf("%d ", IntLL_shift(list));
-                break;
-                
-            case 5:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                printf("%d ", IntLL_pop(list));
-                break;
-                
-            case 6:
-                if (list->length == 0) {
-                    printf("empty ");
-                }
-                scanf("%d", &operand1);
-                index = IntLL_search(list, operand1);
-                printf("%d ", IntLL_delete(list, index + 1));
-                break;
-            case 7:
-                if (list->length == 0) {
-                    printf("empty ");
-                    break;
-                }
-                IntLL_print(list);
-                break;
-            case 8:
-                scanf("%d%*c", &operand1);
-                index = IntLL_search(list, operand1); 
-                if (index == -1) printf("absent ");
-                else printf("present at %d ", index + 1);
-                break;
-            case 9:
-                return 0;
+  return current->value;
+}
 
-        }
-    }    
+IntLL *IntLL_set(IntLL *list, int value, int index) {
+  if (list->head == NULL) {
+    LL_error(LIST_DESTROYED);
+    exit(1);
+  }
+  if (IntLL_is_empty(list)) return list;
+  if (index < 0 || index > list->length - 1) {
+    LL_error(OUT_OF_BOUNDS);
+    return list;
+  }
+
+  IntNode* current = list->head;
+
+  while (index) {
+    current = current->next;
+    index--;
+  }
+
+  current->value = value;
+  return list;
+}
+
+
+typedef struct StackStruct {
+  IntLL *items;
+  IntNode* top;
+  char name;
+} Stack;
+
+int Stack_size (Stack *st) {
+  return st->items->length;
+}
+
+int Stack_get(Stack *st, int index) {
+  return IntLL_get(st->items, index);
+}
+
+Stack *Stack_create (char name) {
+  Stack *st = malloc(sizeof(Stack));
+  st->items = IntLL_create(); 
+  st->top = st->items->head;
+  st->name = name;
+  return st;
+}
+
+int Stack_is_empty (Stack* st) {
+  return IntLL_is_empty(st->items);
+}
+
+void Stack_push (Stack* st, int value) {
+  IntLL_unshift(st->items, value);
+  st->top = st->items->head;
+}
+
+int Stack_pop (Stack *st) {
+  int value = IntLL_shift(st->items);
+  st->top = st->items->head;
+  return value;
+}
+
+int Stack_peek (Stack *st) {
+  return st->top->value; 
+}
+
+void Stack_print (Stack *st) {
+  return IntLL_print(st->items);
 }
