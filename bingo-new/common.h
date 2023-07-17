@@ -6,13 +6,7 @@
 #define true 1
 
 typedef enum {
-  USER, COMP, COMP1,COMP2,COMP3, NONE, USER1, USER2
-  /*
-  int USER = 0
-  int COMP = 1
-  int NONE = 2
-
-  */
+  USER, COMP,COMP1,COMP2,COMP3, NONE, USER1, USER2
 } Player;
 
 void clear_screen () {
@@ -24,10 +18,6 @@ void print_board (SLL** rows, int length, int cls) {
   if (cls) clear_screen();
   for (int i = 0; i < length; i++) {
     print_list(rows[i]);
-    /*
-    print_list([_, _, _..])
-
-    */
   }
 }
 
@@ -138,20 +128,11 @@ else
 
 SLL** create_user_board (int dim) {
   SLL** rows = malloc(dim * sizeof(SLL*));
-  /*
-  {
-    [_, _, ...],
-    ...
-  }
-  */
   int numbers[dim * dim];
   int numbers_count = 0;
-
     // creating dim number of lists
   for (int i = 0; i < dim; i++) {
     rows[i] = createList();
-    // rows[0] =  createList()
-    // SLL*
     for (int j = 0; j < dim; j++) {
       insertAtEnd(rows[i], _);
     }
@@ -165,13 +146,13 @@ SLL** create_user_board (int dim) {
     printf("\n");
     printf("Enter number at (%d, %d): ", numbers_count / dim, numbers_count % dim);
     scanf("%d%*c", &numbers[numbers_count]);
-    while (is_number_existing(rows, dim, numbers[numbers_count])) {
+     while (is_number_existing(rows, dim, numbers[numbers_count])) {
       printf("Enter another number at (%d, %d): ", numbers_count / dim, numbers_count % dim);
       scanf("%d%*c", &numbers[numbers_count]);
     }
-    replace(rows[numbers_count / dim], numbers[numbers_count], numbers_count % dim);
+      replace(rows[numbers_count / dim], numbers[numbers_count], numbers_count % dim);
     numbers_count++;
-
+  
   }
   print_board(rows, dim, true);
   return rows;
@@ -179,18 +160,6 @@ SLL** create_user_board (int dim) {
 
 SLL** create_computer_board (SLL** rows_user, int dim) {
 
-/*
-{
-  [1, 2, 3, 4, 100],
-  ...
-}
-*/
-
-/*
-{
-  [1, 2, 3, 4, 100] 
-}
-*/
 
 
   SLL** rows = malloc(dim * sizeof(SLL*));
@@ -208,7 +177,13 @@ SLL** create_computer_board (SLL** rows_user, int dim) {
   }
 
   // randomising values in numbers array
-  numbers = randomise(numbers, dim * dim);
+  srand(time(NULL));
+  for (int i = 0; i < dim * dim; i++) {
+    int j = rand() % (dim * dim);
+    int temp = numbers[i];
+    numbers[i] = numbers[j];
+    numbers[j] = temp;
+  }
 
   // filling board with values from numbers array
   for (int i = 0; i < dim; i++) {

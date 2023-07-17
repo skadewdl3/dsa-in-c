@@ -3,8 +3,8 @@ all: clean build run
 dev: clean build
 
 build:
-	gcc ./tower-of-hanoi/toh.c -o ./tower-of-hanoi/toh.sh -lm
+	gcc ./trees/binary-tree/serde.c -o ./trees/binary-tree/serde.sh -lm
 clean:
-	rm -rf ./tower-of-hanoi/toh.sh
+	rm -rf ./trees/binary-tree/serde.sh
 run:
-	./tower-of-hanoi/toh.sh
+	./trees/binary-tree/serde.sh

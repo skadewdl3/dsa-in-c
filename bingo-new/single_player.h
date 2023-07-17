@@ -13,15 +13,6 @@ void singlePlayerBingo () {
   SLL** rows_user = create_user_board(dim);
   SLL** rows_comp = create_computer_board(rows_user, dim);
 
-/*
-  {
-
-    SLL* row0,
-    SLL* row1,
-    SLL* row2...
-  }
-*/
-
   // randomises computer calls
   int* computer_calls = (int*)malloc(dim * dim * sizeof(int));
   for (int i = 0; i < dim * dim; i++) {
@@ -37,7 +28,6 @@ void singlePlayerBingo () {
   // user calls a number first
   Player caller = USER;
   Player winner = USER;
-
   int called;
   int num_calls = 0;
 

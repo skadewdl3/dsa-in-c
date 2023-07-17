@@ -62,7 +62,7 @@ void tower_of_hanoi (int disk_count, Stack* source, Stack* auxiliary, Stack* des
 
 int main () {
 
-  disk_count = 4;
+  disk_count = 3;
 
   source = Stack_create('A');
   auxiliary = Stack_create('B');

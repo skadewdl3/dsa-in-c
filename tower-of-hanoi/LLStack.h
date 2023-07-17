@@ -161,6 +161,11 @@ int IntLL_pop(IntLL *list)
     LL_error(LIST_EMPTY);
     return -1;
   }
+  if (list->length == 1) {
+    int head_value = list->head->value;
+    list->length = 0;
+    return head_value;
+  }
   IntNode *current = list->head;
   int length = list->length;
   while (length - 2)
