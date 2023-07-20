@@ -37,25 +37,12 @@ void traverse_postorder (Tree* tree) {
 }
 
 int main () {
-  Tree* tree = BT_create_with_root(1);
-  Node* root = tree->root;
 
-  root->left = create_node(2);
-  root->left->left = create_node(4);
-  root->left->right = create_node(5);
-  root->left->left->left = create_node(7);
-  root->left->left->left->right = create_node(9);
+  int pre_repr[] = {1, 2, 4, 7, NONE, 9, NONE, NONE, NONE, 5, NONE, NONE, 3, NONE, 6, NONE, 8, NONE, NONE };
+  int post_repr[] = {NONE, NONE, NONE, 9, 7, NONE, 4, NONE, NONE, 5, 2, NONE, NONE, NONE, NONE, 8, 6, 3, 1};
+  Tree* tree = deserialize(create_serialization(post_repr, 19, POSTORDER));
 
-
-  root->right = create_node(3);
-  root->right->right = create_node(6);
-  root->right->right->right = create_node(8);
-
-  Serialized* serialized = serialize(tree, POSTORDER);
-  Serialized_print(serialized);
-
-  Tree* deserialized = deserialize(serialized);
-  printf("\n%d\n", tree->root->value);
-  traverse_postorder(deserialized);
-
+  Serialized* post_ser = serialize(tree, POSTORDER);
+  Serialized_print(post_ser);
 }
+

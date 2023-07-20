@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define NONE INT_MIN
+
 typedef enum {
   INORDER, PREORDER, POSTORDER
 } TraversalTypes;
@@ -15,6 +17,8 @@ typedef struct {
   int depth;
   Node* root;
 } Tree;
+
+// Serialization and deserialization
 
 typedef struct {
   int* data;
@@ -33,10 +37,10 @@ Serialized* Serialized_init (TraversalTypes type) {
 void Serialized_print (Serialized* serialized) {
   for (int i = 0; i < serialized->length; i++) {
     if (serialized->data[i] != INT_MIN) {
-      printf("%d ", serialized->data[i]);
+      printf("%d, ", serialized->data[i]);
     }
     else {
-      printf("NULL ");
+      printf("NONE, ");
     }
   }
   
@@ -55,6 +59,7 @@ void Serialized_push (Serialized* serialized, int value) {
   }
 }
 
+// Binary Tree Node
 Node* create_node (int value) {
   Node* node = (Node*)malloc(sizeof(Node));
   node->value = value;
@@ -63,6 +68,8 @@ Node* create_node (int value) {
   return node;
 }
 
+
+// Binary tree
 Tree* BT_create() {
   Tree* tree = (Tree*)malloc(sizeof(tree));
   tree->root = NULL;
@@ -94,6 +101,7 @@ void Tree_destroy (Tree* tree) {
 }
 
 
+// Serde operations
 Serialized* serialize_preorder (Tree* tree) {
 
   Serialized* serialized = Serialized_init(PREORDER);
@@ -168,6 +176,14 @@ Serialized* serialize (Tree* tree, TraversalTypes type) {
   }
 }
 
+Serialized* create_serialization(int* array, int length, TraversalTypes type) {
+  
+  Serialized* serialized = Serialized_init(type);
+  for (int i = 0; i < length; i++) {
+    Serialized_push(serialized, array[i]);
+  }
+  return serialized;
+} 
 
 Tree* deserialize_preorder (Serialized* serialized) {
   int index = 0;
@@ -218,10 +234,10 @@ Tree* deserialize (Serialized* serialized) {
     case PREORDER:
       deserialize_preorder(serialized);
       break;
-    case INORDER:
-      break;
     case POSTORDER:
       deserialize_postorder(serialized);
       break;
   }
 }
+
+// Binary tree operations
