@@ -4,7 +4,7 @@
 #define NONE INT_MIN
 
 typedef enum {
-  INORDER, PREORDER, POSTORDER
+  INORDER, PREORDER, POSTORDER, LEVELWISE
 } TraversalTypes;
 
 typedef struct TreeNode {
@@ -241,3 +241,90 @@ Tree* deserialize (Serialized* serialized) {
 }
 
 // Binary tree operations
+void traverse_nodes_preorder (Node* node) {
+  if (node != NULL) {
+    printf("%d", node->value);
+    if (node->left != NULL) {
+      traverse_nodes_preorder(node->left);
+    }
+    if (node->right != NULL) {
+      traverse_nodes_preorder(node->right);
+    }
+  }
+
+}
+
+void traverse_nodes_inorder (Node* node) {
+  if (node != NULL) {
+    if (node->left != NULL) {
+      traverse_nodes_inorder(node->left);
+    }
+    printf("%d", node->value);
+    if (node->right != NULL) {
+      traverse_nodes_inorder(node->right);
+    }
+  }
+
+}
+
+void traverse_nodes_postorder (Node* node) {
+  if (node != NULL) {
+    if (node->left != NULL) {
+      traverse_nodes_postorder(node->left);
+    }
+    if (node->right != NULL) {
+      traverse_nodes_postorder(node->right);
+    }
+    printf("%d", node->value);
+  }
+
+}
+
+void traverse_nodes_levelwise(Node* node) {
+}
+
+void traverse (Tree* tree, TraversalTypes type) {
+  switch (type) {
+    case PREORDER:
+      traverse_nodes_preorder(tree->root);
+      break;
+    case INORDER:
+      traverse_nodes_inorder(tree->root);
+      break;
+    case POSTORDER:
+      traverse_nodes_postorder(tree->root);
+      break;
+    case LEVELWISE:
+      traverse_nodes_levelwise(tree->root);
+      break;
+  }
+}
+
+void count_leaves (Tree* tree) {
+
+}
+
+void count_nodes (Tree* tree) {
+
+}
+
+void mirror (Tree* tree) {
+
+}
+
+int height (Tree* tree) {
+  int max (int a, int b) {
+    return a > b ? a : b;
+  } 
+  int height_recursion (Node* node) {
+    if (node == NULL) {
+      return 0;
+    }
+    else {
+      int height_left = height_recursion(node->left);
+      int height_right = height_recursion(node->right);
+      return max(height_left, height_right) + 1;
+    }
+  }
+  return height_recursion(tree->root);
+}
